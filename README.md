@@ -11,3 +11,7 @@
     - 本地LLMURL：http://任何支持openai标准接口的api＋端口（如ollama：http://本地IP:11434/v1）
     - 模型名称
     - API key：(ollama)
+
+### 其他说明
+- 支持在仅cpu的环境运行，会自行下载加载small模型
+- 在支持cuda的环境会自行下载large-v3，如需修改，请自行替换worker.py

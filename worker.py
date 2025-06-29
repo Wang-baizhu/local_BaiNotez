@@ -4,11 +4,16 @@ from faster_whisper import WhisperModel
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 import concurrent.futures
+import torch
 
 print("正在加载Whisper模型，请稍候...")
 try:
-    whisper_model = WhisperModel("large-v3", device="cuda", compute_type="float16")
-    print("Whisper模型加载成功。")
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    if device == "cuda":
+        whisper_model = WhisperModel("large-v3", device=device, compute_type="float16")
+    else:
+        whisper_model = WhisperModel("small", device=device, compute_type="int8")
+    print(f"使用{device}Whisper模型加载成功。")
 except Exception as e:
     print(f"加载Whisper模型时出错: {e}")
     whisper_model = None

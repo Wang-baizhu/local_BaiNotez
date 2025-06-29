@@ -1,0 +1,6 @@
+aiohttp
+langchain-openai
+faster_whisper
+python-multipart
+uvicorn
+aiohttp_cors

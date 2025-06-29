@@ -1,6 +1,6 @@
 ### 介绍
 - BaiNotez APP本地后端源码
-- APP下载地址 https://note.bai-keep2025.top:31016/api/download/20250629013924_BaiNotez1.5.0.apk
+- APP下载地址 https://note.bai-keep2025.top:31016/api/download/BaiNotez.apk
 - APP官网 https://note.bai-keep2025.top
 
 ### 使用

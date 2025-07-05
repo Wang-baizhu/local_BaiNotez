@@ -71,6 +71,8 @@ async def process(request):
                 model = await field.text()
             elif field.name == "llmUrl":
                 llm_url = await field.text()
+            elif field.name == "apiKey":
+                apiKey = await field.text()
 
         if not audio_file_path:
             return web.json_response({"error": "缺少音频文件", "code": "NO_AUDIO_FILE"}, status=400)
@@ -83,7 +85,7 @@ async def process(request):
             "original_filename": original_filename or os.path.basename(audio_file_path)
         }
         
-        asyncio.create_task(call_worker(final_task_id, audio_file_path, model, llm_url))
+        asyncio.create_task(call_worker(final_task_id, audio_file_path, model, llm_url, apiKey))
 
         return web.json_response({
             "status": "success",
@@ -93,13 +95,14 @@ async def process(request):
     except Exception as e:
         return web.json_response({"error": str(e), "code": "PROCESS_ERROR"}, status=500)
 
-async def call_worker(task_id, audio_file_path, model, llm_url):
+async def call_worker(task_id, audio_file_path, model, llm_url, apiKey):
     try:
         payload = {
             'audio_file_path': audio_file_path,
             'model': model,
             'llm_url': llm_url,
-            'task_id': task_id
+            'task_id': task_id,
+            'apiKey': apiKey
         }
         async with ClientSession() as session:
             async with session.post(WORKER_URL, json=payload) as response:

@@ -57,9 +57,10 @@ def generate_prompt(text):
     5. 不同部分用---分隔。
     '''
 
-def call_llm(prompt, model, llm_url):
-    chat = ChatOpenAI(model=model or "gemma2:latest", temperature=0.7, streaming=False, api_key="ollama",
+def call_llm(prompt, model, llm_url,apiKey):
+    chat = ChatOpenAI(model=model or "gemma2:latest", temperature=0.7, streaming=False, api_key=apiKey or "ollama",
                       base_url=llm_url or "http://127.0.0.1:11434/v1")
+    print(f"已使用配置:\nmodel:{model}\napi_key:{apiKey}\nbase_url:{llm_url}")
     messages = [
         SystemMessage(content="你是一个专业的音频转录内容总结助手，擅长对音频转录文本进行结构化总结。"),
         HumanMessage(content=prompt)
@@ -77,6 +78,7 @@ async def internal_process(request):
         audio_file = data.get('audio_file_path')
         llmmodel = data.get('model')
         llm_url = data.get('llm_url')
+        apiKey = data.get('apiKey')
 
         if not audio_file:
             return web.json_response({"error": "Missing audio_file_path"}, status=400)
@@ -85,9 +87,10 @@ async def internal_process(request):
         def whisper_task():
             segments, info = whisper_model.transcribe(audio_file,beam_size=5)
             return segments, info
+        print("转录任务开始")
 
         segments, info = await loop.run_in_executor(worker_thread_pool, whisper_task)
-
+        print("转录任务完成")
         transcript_segments = []
         for seg in segments:
             transcript_segments.append({
@@ -104,10 +107,12 @@ async def internal_process(request):
         full_text = preprocess_transcript(transcript)
         prompt = generate_prompt(full_text)
 
+        print("总结任务开始")
         def llm_task():
-            return call_llm(prompt, llmmodel, llm_url)
+            return call_llm(prompt, llmmodel, llm_url, apiKey)
 
         summary_text = await loop.run_in_executor(worker_thread_pool, llm_task)
+        print("总结任务完成")
 
         summary = {
             "summary": summary_text,

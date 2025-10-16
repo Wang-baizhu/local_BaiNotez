@@ -71,6 +71,9 @@ async def process(request):
                 model = await field.text()
             elif field.name == "llmUrl":
                 llm_url = await field.text()
+                # Remove /chat/completions suffix if it exists
+                if llm_url and llm_url.endswith('/chat/completions'):
+                    llm_url = llm_url[:-len('/chat/completions')]
             elif field.name == "apiKey":
                 apiKey = await field.text()
 

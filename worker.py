@@ -78,6 +78,9 @@ async def internal_process(request):
         audio_file = data.get('audio_file_path')
         llmmodel = data.get('model')
         llm_url = data.get('llm_url')
+        # Remove /chat/completions suffix if it exists
+        if llm_url and llm_url.endswith('/chat/completions'):
+            llm_url = llm_url[:-len('/chat/completions')]
         apiKey = data.get('apiKey')
 
         if not audio_file:
